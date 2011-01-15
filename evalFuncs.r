@@ -1,6 +1,12 @@
-# Extract a specific column from a set of named matrices.
-# matCols( A = matrixA, B = matrixB, C = matrixC, col = 20)
-# tall = bool indicating we want a "tall" (i.e. melted) data-frame
+# Either: Extract ONE column from a set of named time-series matrices (i.e. nDates x nSeries )
+# OR: extract multiple columns from ONE time-series matrix,
+# and create a data-frame from these extracted columns.
+# The  matrix(es) need to be supplied in named argument-list,
+# so that these names can be used as column names of the data-frame.
+# If a labels arg is provided, those are used as column names instead.
+# matCols( A = matrixA, B = matrixB, C = matrixC, cols = 'XUV12342', labels = 'IBM', tall = FALSE)
+# tall = either NULL, or if  a pair (idName, variableName) is supplied, the data-frame
+# will be melted using id = idName, variable_name = variableName
 matCols <- function(..., cols = c(), labels = c(), tall = c() ) {
   if(is.null(col))
     cols <- 1
@@ -32,6 +38,17 @@ matCols <- function(..., cols = c(), labels = c(), tall = c() ) {
 
 
 
+
+
+## "Matrix plot", i.e. take a named arg-list of matrices, and extract the
+## column indicated by 'tkr' from each, plot them as time-series,
+## highlighting the periods during which the given expression 'ex' is TRUE.
+## same = indicates whether to plot them on same plot
+matPlot <- function(..., tkr = c(), ex = c(), same = FALSE) {
+  df <- matCols(..., cols = tkr )
+  p <- eval( substitute( mplot(df, expr = ex, same = same)))
+  invisible(p)
+}
 
 # Take a data-frame = (y1, y2, ... ) and plot multiple y series
 # If an id column is supplied, idCol should be that column, 
@@ -78,13 +95,3 @@ mplot <- function(df, idCol = c(), expr = c(), same = T) {
   print(final)
   invisible(final)
 }                   
-
-## "Matrix plot", i.e. take a named arg-list of matrices, and extract the
-## column indicated by 'tkr' from each, plot them as time-series,
-## highlighting the periods during which the given expression 'ex' is TRUE.
-## same = indicates whether to plot them on same plot
-matPlot <- function(..., tkr = c(), ex = c(), same = FALSE) {
-  df <- matCols(..., cols = tkr )
-  p <- eval( substitute( mplot(df, expr = ex, same = same)))
-  invisible(p)
-}
